@@ -1,3 +1,3 @@
 # Embedded_Systems_Project
 
-APPLYING EMBEDDED SYSTEMS COURSE TO DESIGN A SIMBLE GPS 
+Implementing a GPS using tiva C micro controller
