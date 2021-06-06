@@ -44,3 +44,39 @@ char Read_data ()
     while((UART7_FR_R & UART_FR_RXFE) == UART_FR_RXFE);
     return (uint8_t) UART7_DR_R & 0xFF;
 }
+void Write_data(uint8_t data){
+    while ((UART0_FR_R & UART_FR_TXFF) == UART_FR_TXFF);
+    UART0_DR_R = data;
+}
+
+void Read_command(char* str, uint8_t mexlen){
+    uint8_t i;
+    char c;
+    for(i=0; i<50; i++){
+        c = Read_data();
+        if(c == '\n' || c == '\r') break;
+                else str[i] = c;
+        Write_data(c);
+    }
+}
+
+void print_command(char *str){
+    uint8_t i = 0;
+    while (str[i] != '\0'){
+        Write_data(str[i]);
+        i++;
+    }
+}
+
+int main (){
+    char command [maxlen] = {0};
+    uint32_t i;
+    initUART0();
+    initUART7();
+
+    while(1){
+        Read_command(command, maxlen);
+        print_command(command);
+        for(i = 0; i < 3100; i++);
+    }
+}
