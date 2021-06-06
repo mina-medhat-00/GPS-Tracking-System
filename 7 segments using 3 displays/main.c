@@ -28,26 +28,7 @@ uint16_t num_array[10] = { 0x3F,0x06,0x5B,0X4F,0X66,0X6D,0X7D,0X07,0X7F,0X6F };
   //GPIO_PORTB_DATA_R = num_array[num];
 //}
 //int i = 0;
-void sys_delay(uint32_t time)
-{
-    //enter time in milli second
-    uint32_t count;
-    count = time/(62.5*1e-6);
-    NVIC_ST_CTRL_R = 0;
-    NVIC_ST_RELOAD_R = count-1;
-    NVIC_ST_CURRENT_R = 0;
-    NVIC_ST_CTRL_R = 5;
-    while((NVIC_ST_CTRL_R&0x10000) == 0){};
 
-}
-void lot_delay(int n)
-	{
-		int i=0;
-	for (;i<n;i++){
-		sys_delay(1000);
-	}
-	
-}
 void display(int u, int t, int h);
 int main (){
   init();
