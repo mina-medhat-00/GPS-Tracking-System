@@ -47,10 +47,10 @@ void LCD_init(void)
    LCD_command(0x30);
    sys_delay(10);
    LCD_command(0x30);
-   LCD_command(0x38); /* set 8-bit data, 2-line, 5x7 font /
-   LCD_command(0x06); / move cursor right /
-   LCD_command(0x01); / clear screen, move cursor to home /
-   LCD_command(0x0F); / turn on display, cursor blinking */
+   LCD_command(0x38); // set 8-bit data, 2-line, 5x7 font 
+   LCD_command(0x06); // move cursor right 
+   LCD_command(0x01); //clear screen, move cursor to home 
+   LCD_command(0x0F); // turn on display, cursor blinking 
 
  }
  
@@ -69,4 +69,4 @@ void LCD_init(void)
 		 
 }
  
- 
+
