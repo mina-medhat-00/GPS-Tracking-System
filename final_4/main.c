@@ -12,6 +12,7 @@
 
 unsigned char latitude[] = { 0 };
 unsigned char longitude[] = { 0 };
+int num_array[10] = { 0x3F,0x06,0x05B,0X4F,0X66,0X6D,0X7D,0X07,0X7F,0X6F};
 
 void init_UART0() {
     SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R0;
@@ -177,10 +178,6 @@ double gps_distance(double lat1, double lon1, double lat2, double lon2) {
     d = sqrt(x * x + y * y) * R;
     return d;
 }
-
-int num_array[10] = { 0x3F,0x06,0x05B,0X4F,0X66,0X6D,0X7D,0X07,0X7F,0X6F};
-
-void Num_Write(int);
 
 void setup() 
 { 
