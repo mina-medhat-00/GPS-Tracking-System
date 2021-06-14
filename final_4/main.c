@@ -182,16 +182,16 @@ double gps_distance(double lat1, double lon1, double lat2, double lon2) {
 void init_display() 
 
 { 
- SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
+     SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
       while ((SYSCTL_PRGPIO_R &= 0x02)==0) {};
       GPIO_PORTB_DIR_R |= 0XFF;
       GPIO_PORTB_DEN_R |= 0XFF;
       GPIO_PORTB_AMSEL_R &= 0;
       GPIO_PORTB_AFSEL_R &= 0;
       GPIO_PORTB_PCTL_R &= 0;
-            GPIO_PORTB_DATA_R = 0xFF;
+      GPIO_PORTB_DATA_R = 0xFF;
 
-            SYSCTL_RCGCGPIO_R |= 0x01;   //activate port A we can decide the port later 
+      SYSCTL_RCGCGPIO_R |= 0x01;   //activate port A we can decide the port later 
       while ((SYSCTL_PRGPIO_R &= 0x01)==0) {};
       GPIO_PORTA_DIR_R |= 0XFF;
       GPIO_PORTA_DEN_R |= 0XFF;
@@ -200,8 +200,29 @@ void init_display()
       GPIO_PORTA_PCTL_R &= 0;
 
 }
-void Num_Write(int num){
-GPIO_PORTD_DATA_R = num_array[num];
+void display_7segment (uint8_t u, uint8_t t, uint8_t h){
+	
+	uint32_t count;
+    count = 500/(62.5*1e-6);
+    NVIC_ST_CTRL_R = 0;
+    NVIC_ST_RELOAD_R = count-1;
+    NVIC_ST_CURRENT_R = 0;
+    NVIC_ST_CTRL_R = 5;
+	
+    while((NVIC_ST_CTRL_R&0x10000) == 0){
+			
+		GPIO_PORTB_DATA_R = num_array[u];
+		GPIO_PORTA_DATA_R = ~0x10;
+		for (x=0; x < 1000; x++){}
+			
+		GPIO_PORTB_DATA_R = num_array[t];
+		GPIO_PORTA_DATA_R = ~0x20;
+		for (x=0; x < 1000; x++){}
+			
+		GPIO_PORTB_DATA_R = num_array[h];
+		GPIO_PORTA_DATA_R = ~0x40;
+		for (x=0; x < 1000; x++){}
+		};
 }
 
 
