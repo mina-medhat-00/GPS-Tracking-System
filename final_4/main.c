@@ -178,7 +178,26 @@ double gps_distance(double lat1, double lon1, double lat2, double lon2) {
     return d;
 }
 
+int num_array[10] = { 0x3F,0x06,0x05B,0X4F,0X66,0X6D,0X7D,0X07,0X7F,0X6F};
 
+void Num_Write(int);
+
+void setup() 
+{ 
+ SYSCTL_RCGCGPIO_R |= 0x08;   //activate port D  we can decide the port later 
+  while ((SYSCTL_PRGPIO_R|=0x08)) {};
+      GPIO_PORTD_LOCK_R|=0X4F4C434B ;
+      GPIO_PORTD_CR_R|=0XFF;
+      GPIO_PORTD_DIR_R|=0XFF;
+      GPIO_PORTD_DEN_R|=0XFF;
+      GPIO_PORTD_AMSEL_R&=~0XFF;
+      GPIO_PORTD_AFSEL_R&=~0XFF;
+      GPIO_PORTD_PCTL_R=0;
+
+}
+void Num_Write(int num){
+GPIO_PORTD_DATA_R = num_array[num];
+}
 
 
 int main() {
