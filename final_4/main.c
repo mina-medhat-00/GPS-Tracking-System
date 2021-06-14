@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tm4c123gh6pm.h"
+#include "math.h"
 
+#define pi 3.141592654
+#define R 6371000
 #define PA01 0x03
 #define PD67 0xC0
 #define maxlen 80
@@ -152,6 +155,33 @@ void lot_delay(int n)
         sys_delay(1000);
     }
 }
+
+double distance(double r)
+{
+    static double z = 0;
+    z += r;
+    return z;
+}
+double rad(double w)
+{
+    double v = 0;
+    v = w * pi / 180;
+    return v;
+}
+
+double gps_distance(double lat1, double lon1, double lat2, double lon2) {
+    double x, y, d;
+    x = (lon2 - lon1) * cos(rad(lat1 + lat2) / 2);
+    y = lat1 + lat2;
+    d = sqrt(x * x + y * y) * R;
+    return d;
+}
+
+
+
+
+
+
 
 
 int main() {
