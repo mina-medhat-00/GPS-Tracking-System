@@ -122,6 +122,38 @@ double ascii_number(const char dimension[]) {
     return strtod(dimension, example);
 }
 
+double decimel(double lat)
+{
+    double j = lat / 100;
+    int degree = j;
+    double minitues = (j - (double)degree) * 100;
+    double degree2 = minitues / 60;
+    double degree_final = (double)degree + degree2;
+    return degree_final;
+}
+
+void sys_delay(uint32_t time)
+{
+    //enter time in milli second
+    uint32_t count;
+    count = time / (62.5 * 1e-6);
+    NVIC_ST_CTRL_R = 0;
+    NVIC_ST_RELOAD_R = count - 1;
+    NVIC_ST_CURRENT_R = 0;
+    NVIC_ST_CTRL_R = 5;
+    while ((NVIC_ST_CTRL_R & 0x10000) == 0) {};
+
+}
+
+void lot_delay(int n)
+{
+    int i = 0;
+    for (; i < n; i++) {
+        sys_delay(1000);
+    }
+}
+
+
 int main() {
     unsigned char command[100] = { 0 };
     //char c;
