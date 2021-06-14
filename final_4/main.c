@@ -179,17 +179,25 @@ double gps_distance(double lat1, double lon1, double lat2, double lon2) {
     return d;
 }
 
-void setup() 
+void init_display() 
+
 { 
- SYSCTL_RCGCGPIO_R |= 0x08;   //activate port D  we can decide the port later 
-  while ((SYSCTL_PRGPIO_R|=0x08)) {};
-      GPIO_PORTD_LOCK_R|=0X4F4C434B ;
-      GPIO_PORTD_CR_R|=0XFF;
-      GPIO_PORTD_DIR_R|=0XFF;
-      GPIO_PORTD_DEN_R|=0XFF;
-      GPIO_PORTD_AMSEL_R&=~0XFF;
-      GPIO_PORTD_AFSEL_R&=~0XFF;
-      GPIO_PORTD_PCTL_R=0;
+ SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
+      while ((SYSCTL_PRGPIO_R &= 0x02)==0) {};
+      GPIO_PORTB_DIR_R |= 0XFF;
+      GPIO_PORTB_DEN_R |= 0XFF;
+      GPIO_PORTB_AMSEL_R &= 0;
+      GPIO_PORTB_AFSEL_R &= 0;
+      GPIO_PORTB_PCTL_R &= 0;
+            GPIO_PORTB_DATA_R = 0xFF;
+
+            SYSCTL_RCGCGPIO_R |= 0x01;   //activate port A we can decide the port later 
+      while ((SYSCTL_PRGPIO_R &= 0x01)==0) {};
+      GPIO_PORTA_DIR_R |= 0XFF;
+      GPIO_PORTA_DEN_R |= 0XFF;
+      GPIO_PORTA_AMSEL_R &= 0;
+      GPIO_PORTA_AFSEL_R &= 0;
+      GPIO_PORTA_PCTL_R &= 0;
 
 }
 void Num_Write(int num){
