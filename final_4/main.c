@@ -9,6 +9,9 @@
 #define PA01 0x03
 #define PD67 0xC0
 #define maxlen 80
+#define delay1 100
+#define PA567 0xFF
+#define PB 0xFF
 
 unsigned char latitude[] = { 0 };
 unsigned char longitude[] = { 0 };
@@ -225,6 +228,73 @@ void display_7segment(uint8_t u, uint8_t t, uint8_t h) {
     };
 }
 
+void delay_micro(uint8_t n)
+{
+    int i, j;
+    for (i = 0; i < n; i++)
+        for (j = 0; j < 3; j++)
+        {
+        }
+}
+
+void LCD_command(uint8_t command)
+{
+    GPIO_PORTA_DATA_R = 0;
+    GPIO_PORTB_DATA_R = command;
+    GPIO_PORTA_DATA_R = 0x80; //port a bit 7 enable
+    sys_delay(1);
+    GPIO_PORTA_DATA_R = 0;
+    if (command < 4)
+        sys_delay(5);
+
+    else
+        delay_micro(37);
+
+}
+
+void LCD_data(uint8_t data)
+{
+    GPIO_PORTA_DATA_R = 0x20; //port a bit 5
+    GPIO_PORTB_DATA_R = data;
+    sys_delay(5);
+    GPIO_PORTA_DATA_R |= 0x80; //port A bit 5, 7    RS=1   enable=1
+    sys_delay(5);
+    GPIO_PORTA_DATA_R = 0;
+
+}
+
+void LCD_init(void)
+{
+    SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R0; //ENABLE PORT A AND PORT B
+    SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R1;
+    sys_delay(1);
+
+    GPIO_PORTA_AFSEL_R &= 0;
+    GPIO_PORTA_AMSEL_R &= 0;
+    GPIO_PORTA_PCTL_R &= 0;
+
+    GPIO_PORTB_AFSEL_R &= 0;
+    GPIO_PORTB_AMSEL_R &= 0;
+    GPIO_PORTB_PCTL_R &= 0;
+
+    GPIO_PORTA_DIR_R |= PA567;
+    GPIO_PORTA_DEN_R |= PA567;
+    GPIO_PORTB_DIR_R |= PB;
+    GPIO_PORTB_DEN_R |= PB;
+    sys_delay(5);
+    LCD_command(0x30);
+    sys_delay(50);
+    LCD_command(0x38); // set 8-bit data, 2-line, 5x7 font
+    sys_delay(5);
+    LCD_command(0x06); // move cursor right
+    sys_delay(5);
+    LCD_command(0x0F); // turn on display, cursor blinking
+    sys_delay(5);
+    LCD_command(0x01);
+    sys_delay(5);
+}
+
+
 
 int main() {
     unsigned char command[100] = { 0 };
@@ -243,6 +313,7 @@ int main() {
     init_UART0();
     init_UART2();
     init_display();
+    LCD_init();
 
 
     while (1)
@@ -252,7 +323,7 @@ int main() {
 
         //c = Read_data();
         //Write_data(c);
-        Read_command(command, 100);
+        Read_command(command, maxlen);
         //print_command(command);
         GPRMC(command);
         //print_command(longitude);
@@ -279,6 +350,9 @@ int main() {
         T = T0 / 10;   // ten
         U0 = T0 - 10 * T;
         display_7segment(H, T, U0);
+        LCD_command(0x01); //clear display
+        LCD_command(0x80); //cursor location
+
 
     }
 }
