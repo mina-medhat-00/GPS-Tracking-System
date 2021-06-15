@@ -311,7 +311,8 @@ int main() {
     uint8_t H = 0;
     uint8_t T = 0;
     uint8_t T0 = 0;
-    uint8_t U0 = 0;;
+    uint8_t U0 = 0;
+    uint8_t i = 0;
     //char c;
     init_UART0();
     init_UART2();
@@ -323,7 +324,7 @@ int main() {
     {
         double longi = 0;
         double lat = 0;
-
+        unsigned char c[3] = "0";
         //c = Read_data();
         //Write_data(c);
         Read_command(command, maxlen);
@@ -355,6 +356,15 @@ int main() {
         display_7segment(H, T, U0);
         LCD_command(0x01); //clear display
         LCD_command(0x80); //cursor location
+        c[0] = '0' + H;
+        c[1] = '0' + T;
+        c[2] = '0' + U0;
+        while (c[i] != '\0') {
+            LCD_data(c[i]);
+            i++;
+            sys_delay(100);
+        }
+        sys_delay(500);
 
 
     }
