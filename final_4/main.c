@@ -12,7 +12,7 @@
 
 unsigned char latitude[] = { 0 };
 unsigned char longitude[] = { 0 };
-int num_array[10] = { 0x3F,0x06,0x05B,0X4F,0X66,0X6D,0X7D,0X07,0X7F,0X6F};
+int num_array[10] = { 0x3F,0x06,0x05B,0X4F,0X66,0X6D,0X7D,0X07,0X7F,0X6F };
 
 void init_UART0() {
     SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R0;
@@ -179,61 +179,77 @@ double gps_distance(double lat1, double lon1, double lat2, double lon2) {
     return d;
 }
 
-void init_display() 
+void init_display()
 
-{ 
-     SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
-      while ((SYSCTL_PRGPIO_R &= 0x02)==0) {};
-      GPIO_PORTB_DIR_R |= 0XFF;
-      GPIO_PORTB_DEN_R |= 0XFF;
-      GPIO_PORTB_AMSEL_R &= 0;
-      GPIO_PORTB_AFSEL_R &= 0;
-      GPIO_PORTB_PCTL_R &= 0;
-      GPIO_PORTB_DATA_R = 0xFF;
+{
+    SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
+    while ((SYSCTL_PRGPIO_R &= 0x02) == 0) {};
+    GPIO_PORTB_DIR_R |= 0XFF;
+    GPIO_PORTB_DEN_R |= 0XFF;
+    GPIO_PORTB_AMSEL_R &= 0;
+    GPIO_PORTB_AFSEL_R &= 0;
+    GPIO_PORTB_PCTL_R &= 0;
+    GPIO_PORTB_DATA_R = 0xFF;
 
-      SYSCTL_RCGCGPIO_R |= 0x01;   //activate port A we can decide the port later 
-      while ((SYSCTL_PRGPIO_R &= 0x01)==0) {};
-      GPIO_PORTA_DIR_R |= 0XFF;
-      GPIO_PORTA_DEN_R |= 0XFF;
-      GPIO_PORTA_AMSEL_R &= 0;
-      GPIO_PORTA_AFSEL_R &= 0;
-      GPIO_PORTA_PCTL_R &= 0;
+    SYSCTL_RCGCGPIO_R |= 0x01;   //activate port A we can decide the port later 
+    while ((SYSCTL_PRGPIO_R &= 0x01) == 0) {};
+    GPIO_PORTA_DIR_R |= 0XFF;
+    GPIO_PORTA_DEN_R |= 0XFF;
+    GPIO_PORTA_AMSEL_R &= 0;
+    GPIO_PORTA_AFSEL_R &= 0;
+    GPIO_PORTA_PCTL_R &= 0;
 
 }
-void display_7segment (uint8_t u, uint8_t t, uint8_t h){
-	
-	uint32_t count;
-    count = 500/(62.5*1e-6);
+void display_7segment(uint8_t u, uint8_t t, uint8_t h) {
+    uint16_t x = 0;
+    uint32_t count;
+    count = 500 / (62.5 * 1e-6);
     NVIC_ST_CTRL_R = 0;
-    NVIC_ST_RELOAD_R = count-1;
+    NVIC_ST_RELOAD_R = count - 1;
     NVIC_ST_CURRENT_R = 0;
     NVIC_ST_CTRL_R = 5;
-	
-    while((NVIC_ST_CTRL_R&0x10000) == 0){
-			
-		GPIO_PORTB_DATA_R = num_array[u];
-		GPIO_PORTA_DATA_R = ~0x10;
-		for (x=0; x < 1000; x++){}
-			
-		GPIO_PORTB_DATA_R = num_array[t];
-		GPIO_PORTA_DATA_R = ~0x20;
-		for (x=0; x < 1000; x++){}
-			
-		GPIO_PORTB_DATA_R = num_array[h];
-		GPIO_PORTA_DATA_R = ~0x40;
-		for (x=0; x < 1000; x++){}
-		};
+
+    while ((NVIC_ST_CTRL_R & 0x10000) == 0) {
+
+        GPIO_PORTB_DATA_R = num_array[u];
+        GPIO_PORTA_DATA_R = ~0x10;
+        for (x = 0; x < 1000; x++) {}
+
+        GPIO_PORTB_DATA_R = num_array[t];
+        GPIO_PORTA_DATA_R = ~0x20;
+        for (x = 0; x < 1000; x++) {}
+
+        GPIO_PORTB_DATA_R = num_array[h];
+        GPIO_PORTA_DATA_R = ~0x40;
+        for (x = 0; x < 1000; x++) {}
+    };
 }
 
 
 int main() {
     unsigned char command[100] = { 0 };
+    double longi1 = 0;
+    double lat1 = 0;
+    double longi2 = 0;
+    double lat2 = 0;
+    double distances = 0;
+    double final_distance = 0;
+    uint8_t x = 1;
+    uint8_t H = 0;
+    uint8_t T = 0;
+    uint8_t T0 = 0;
+    uint8_t U0 = 0;;
     //char c;
     init_UART0();
     init_UART2();
+    init_display();
+
 
     while (1)
     {
+        double longi = 0;
+        double lat = 0;
+
         //c = Read_data();
         //Write_data(c);
         Read_command(command, 100);
@@ -241,6 +257,29 @@ int main() {
         GPRMC(command);
         //print_command(longitude);
         //print_command(latitude);
+
+        longi = ascii_number((const char*)longitude);
+        lat = ascii_number((const char*)latitude);
+        longi = decimel(longi);
+        lat = decimel(lat);
+        if (x) {
+            lat1 = rad(lat);
+            longi1 = rad(longi);
+            x = !x;
+        }
+        else {
+            lat2 = lat;
+            longi2 = rad(longi);
+            x = !x;
+        }
+        distances = gps_distance(lat1, longi1, lat2, longi2);
+        final_distance = distance(distances);
+        H = final_distance / 100;   // what we need for hundred
+        T0 = final_distance - 100 * H;
+        T = T0 / 10;   // ten
+        U0 = T0 - 10 * T;
+        display_7segment(H, T, U0);
+
     }
 }
 
