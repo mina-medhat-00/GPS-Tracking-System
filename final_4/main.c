@@ -61,22 +61,20 @@ void init_UART2() //UART2_INIT OF D6 "RX" & D7 "TX"
 void init_display()
 
 {
-    SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
+   SYSCTL_RCGCGPIO_R |= 0x02;   //activate port B  we can decide the port later 
     while ((SYSCTL_PRGPIO_R &= 0x02) == 0) {};
     GPIO_PORTB_DIR_R |= 0XFF;
     GPIO_PORTB_DEN_R |= 0XFF;
     GPIO_PORTB_AMSEL_R &= 0;
     GPIO_PORTB_AFSEL_R &= 0;
     GPIO_PORTB_PCTL_R &= 0;
-    GPIO_PORTB_DATA_R = 0xFF;
 
     SYSCTL_RCGCGPIO_R |= 0x01;   //activate port A we can decide the port later 
     while ((SYSCTL_PRGPIO_R &= 0x01) == 0) {};
-    GPIO_PORTA_DIR_R |= 0XFF;
-    GPIO_PORTA_DEN_R |= 0XFF;
-    GPIO_PORTA_AMSEL_R &= 0;
-    GPIO_PORTA_AFSEL_R &= 0;
-    GPIO_PORTA_PCTL_R &= 0;
+    GPIO_PORTA_DIR_R |= 0X70;
+    GPIO_PORTA_DEN_R |=  0X70;
+    GPIO_PORTA_AMSEL_R &= ~0X70;
+    GPIO_PORTA_AFSEL_R &=  ~0X70;
 
 }
 
