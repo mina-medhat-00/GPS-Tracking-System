@@ -3,6 +3,7 @@
 #include <string.h>
 #include "tm4c123gh6pm.h"
 #include "math.h"
+#include <TM4C123.h>
 
 #define pi 3.141592654
 #define R 6371000
@@ -12,6 +13,8 @@
 #define delay1 100
 #define PA567 0xFF
 #define PB 0xFF
+
+
 
 unsigned char latitude[] = { 0 };
 unsigned char longitude[] = { 0 };
@@ -314,7 +317,7 @@ int main() {
     init_UART2();
     init_display();
     LCD_init();
-
+    SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2));
 
     while (1)
     {
