@@ -1,4 +1,4 @@
-# GPS Tracking System Readme
+# GPS Tracking System
 
 ## Table of Contents
 - [Introduction](#introduction)
